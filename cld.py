@@ -2,7 +2,7 @@
 """
 Created on Thu Mar  3 17:25:45 2022
 
-@author: dalen
+@author: dalens
 """
 
 import string
@@ -47,7 +47,7 @@ def main(df, CI):
     groups = sorted(list(groupSet))
 
     # Creating lists of letters that will be assigned to treatment groups
-    letters = list(string.ascii_lowercase)[:len(groups)]
+    letters = list(string.ascii_lowercase+string.digits)[:len(groups)]
     cldgroups = letters
 
     # the following algoritm is a simplification of the classical cld,
@@ -70,7 +70,6 @@ def main(df, CI):
 
     # this part will reassign the final name to the group
     # for sure there are more elegant ways of doing this
-    cld = cld.sort_values(cld.columns[2], key=lambda x: x.str.len())
     cld["labels"] = ""
     letters = list(string.ascii_lowercase)
     unique = []
@@ -84,16 +83,16 @@ def main(df, CI):
 
         for kitem in cld[1]:
             if kitem in item:
-                if cld["labels"].loc[cld[1] == kitem].iloc[0] == "":
-                    cld["labels"].loc[cld[1] == kitem] += letters[g]
-
+                #Checking if there are forbidden pairing (proposition of solution to the imperfect script)                
                 forbidden = set()
                 for row in cld.itertuples():
                     if letters[g] in row[5]:
                         forbidden |= set(row[4])
-
                 if kitem in forbidden:
                     g=len(unique)+1
+               
+                if cld["labels"].loc[cld[1] == kitem].iloc[0] == "":
+                   cld["labels"].loc[cld[1] == kitem] += letters[g] 
                
                 # Checking if columns 1 & 2 of cld share at least 1 letter
                 if len(set(cld["labels"].loc[cld[1] == kitem].iloc[0]).intersection(cld.loc[cld[2] == item, "labels"].iloc[0])) <= 0:
