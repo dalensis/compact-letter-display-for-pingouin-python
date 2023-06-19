@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on 01/Aug/2022
+Updated on 19/Jun/2023
 
 @author: dalens
 """
@@ -44,7 +45,7 @@ def main(df, CI):
     group1 = set(df.group1.tolist())  # Dropping duplicates by creating a set
     group2 = set(df.group2.tolist())  # Dropping duplicates by creating a set
     groupSet = group1 | group2  # Set operation that creates a union of 2 sets
-    groups = sorted(list(groupSet))
+    groups = list(groupSet)
 
     # Creating lists of letters that will be assigned to treatment groups
     letters = list(string.ascii_lowercase+string.digits)[:len(groups)]
