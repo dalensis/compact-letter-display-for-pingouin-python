@@ -102,6 +102,9 @@ def main(df, CI):
                     if letters[g] not in list(cld["labels"].loc[cld[2] == item].iloc[0]):
                         cld["labels"].loc[cld[2] == item] += letters[g]
 
+                 if kitem in forbidden: #back to previous letter
+                    g-=1
+    
     cld = cld.sort_values("labels")
     cld.drop(columns=[1, 2, 3], inplace=True)
     print(cld)
