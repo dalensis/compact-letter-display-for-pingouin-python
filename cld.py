@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on 01/Aug/2022
-Updated on 19/Jun/2023
+Created on Thu Mar  3 17:25:45 2022
 
-@author: dalens
+@author: dalen
 """
 
 import string
 import pandas as pd
 
-def main(df, CI):
+def main(df, CI, order):
     
     alpha = 1-CI/100
     
@@ -42,10 +41,11 @@ def main(df, CI):
     df["p-adj"] = df["p-adj"].astype(float)
 
     # Creating a list of the different treatment groups from Tukey's
-    group1 = set(df.group1.tolist())  # Dropping duplicates by creating a set
-    group2 = set(df.group2.tolist())  # Dropping duplicates by creating a set
-    groupSet = group1 | group2  # Set operation that creates a union of 2 sets
-    groups = list(groupSet)
+    #group1 = set(df.group1.tolist())  # Dropping duplicates by creating a set
+    #group2 = set(df.group2.tolist())  # Dropping duplicates by creating a set
+    #groupSet = group1 | group2  # Set operation that creates a union of 2 sets
+    #groups = sorted(list(groupSet))
+    groups=order
 
     # Creating lists of letters that will be assigned to treatment groups
     letters = list(string.ascii_lowercase+string.digits)[:len(groups)]
@@ -71,6 +71,7 @@ def main(df, CI):
 
     # this part will reassign the final name to the group
     # for sure there are more elegant ways of doing this
+    #cld = cld.sort_values(cld.columns[2], key=lambda x: x.str.len())
     cld["labels"] = ""
     letters = list(string.ascii_lowercase)
     unique = []
@@ -84,7 +85,10 @@ def main(df, CI):
 
         for kitem in cld[1]:
             if kitem in item:
-                #Checking if there are forbidden pairing (proposition of solution to the imperfect script)                
+                #Checking if there are forbidden pairing                 
+                #if kitem in ' '.join(cld[3][cld["labels"]>=letters[g]]): 
+                #   g=len(unique)+1
+                
                 forbidden = set()
                 for row in cld.itertuples():
                     if letters[g] in row[5]:
@@ -93,19 +97,18 @@ def main(df, CI):
                     g=len(unique)+1
                
                 if cld["labels"].loc[cld[1] == kitem].iloc[0] == "":
-                   cld["labels"].loc[cld[1] == kitem] += letters[g] 
+                   cld.loc[cld[1] == kitem, "labels"] += letters[g] 
                
                 # Checking if columns 1 & 2 of cld share at least 1 letter
                 if len(set(cld["labels"].loc[cld[1] == kitem].iloc[0]).intersection(cld.loc[cld[2] == item, "labels"].iloc[0])) <= 0:
                     if letters[g] not in list(cld["labels"].loc[cld[1] == kitem].iloc[0]):
-                        cld["labels"].loc[cld[1] == kitem] += letters[g]
+                        cld.loc[cld[1] == kitem, "labels"] += letters[g]
                     if letters[g] not in list(cld["labels"].loc[cld[2] == item].iloc[0]):
-                        cld["labels"].loc[cld[2] == item] += letters[g]
+                        cld.loc[cld[2] == item, "labels"] += letters[g]
 
-                 if kitem in forbidden: #back to previous letter
-                    g-=1
-    
     cld = cld.sort_values("labels")
+    #print(cld)
+    #print('\n')
     cld.drop(columns=[1, 2, 3], inplace=True)
     print(cld)
     print('\n')
